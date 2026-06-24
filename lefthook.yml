@@ -6,4 +6,4 @@ pre-commit:
       run: ./gradlew check -q
     frontend-build:
       root: "packages/frontend/"
-      run: npx next build --no-lint
+      run: npx next build
