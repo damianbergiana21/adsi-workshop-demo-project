@@ -1,0 +1,9 @@
+pre-commit:
+  parallel: false
+  commands:
+    backend-check:
+      root: "packages/backend/"
+      run: ./gradlew check -q
+    frontend-build:
+      root: "packages/frontend/"
+      run: npx next build --no-lint
