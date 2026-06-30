@@ -5,7 +5,7 @@
     "boot": "cd packages/backend && ./gradlew bootRun",
     "boot:workshop": "cd packages/backend && ./gradlew bootRun --args='--spring.profiles.active=workshop'",
     "dev": "cd packages/frontend && npm run dev",
-    "dev:sagemaker": "cd packages/frontend && NEXT_PUBLIC_BASE_PATH=/ports/3000 npx next dev --webpack",
+    "dev:sagemaker": "cd packages/frontend && SAGEMAKER=1 NEXT_PUBLIC_BASE_PATH=/codeeditor/default/absports/3000 npx next build && (SAGEMAKER=1 NEXT_PUBLIC_BASE_PATH=/codeeditor/default/absports/3000 npx next start -p 3001 & node scripts/sagemaker-proxy.mjs)",
     "build:backend": "cd packages/backend && ./gradlew bootJar",
     "build:frontend": "cd packages/frontend && npm run build",
     "check:backend": "cd packages/backend && ./gradlew check",
