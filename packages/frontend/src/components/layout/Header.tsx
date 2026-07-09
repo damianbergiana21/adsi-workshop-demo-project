@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth, useLogout } from "@/features/auth/useAuth";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ export function Header() {
       <SidebarTrigger />
       <Separator orientation="vertical" className="h-6" />
       <div className="flex-1" />
+      <ThemeToggle />
       {user && (
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground">

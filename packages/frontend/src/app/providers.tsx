@@ -2,6 +2,7 @@
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getQueryClient } from "@/lib/query-client";
 
@@ -14,7 +15,9 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>{children}</TooltipProvider>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <TooltipProvider>{children}</TooltipProvider>
+      </ThemeProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
