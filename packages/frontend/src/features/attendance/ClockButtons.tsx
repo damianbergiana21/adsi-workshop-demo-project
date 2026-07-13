@@ -32,7 +32,7 @@ function CurrentTime() {
 
   return (
     <div className="text-center">
-      <p className="text-4xl font-bold tabular-nums tracking-tight">{timeStr}</p>
+      <p className="text-4xl font-bold tabular-nums tracking-tight text-purple-600">{timeStr}</p>
       <p className="text-sm text-muted-foreground mt-1">{dateStr}</p>
     </div>
   );
@@ -63,7 +63,7 @@ export function ClockButtons() {
   }
 
   const status = todayStatus?.status ?? "NOT_CLOCKED_IN";
-  const canClockIn = status === "NOT_CLOCKED_IN" || status !== "CLOCKED_OUT";
+  const canClockIn = status === "NOT_CLOCKED_IN";
   const canClockOut = status === "CLOCKED_IN";
   const isPending = clockInMutation.isPending || clockOutMutation.isPending;
 
