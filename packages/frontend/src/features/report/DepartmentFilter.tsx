@@ -24,7 +24,13 @@ export function DepartmentFilter({ value, onChange }: DepartmentFilterProps) {
   return (
     <Select value={value} onValueChange={handleChange}>
       <SelectTrigger>
-        <SelectValue placeholder="全部署" />
+        <SelectValue placeholder="全部署">
+          {(v: string | null) => {
+            if (!v || v === "all") return "全部署";
+            const dept = departments.find((d) => d.id === v);
+            return dept?.name ?? v;
+          }}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">全部署</SelectItem>

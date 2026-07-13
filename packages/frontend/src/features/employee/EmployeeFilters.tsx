@@ -36,7 +36,13 @@ export function EmployeeFilters({
         onValueChange={(value) => onDepartmentIdChange(value ?? "")}
       >
         <SelectTrigger>
-          <SelectValue placeholder="部署で絞り込み" />
+          <SelectValue placeholder="部署で絞り込み">
+            {(value: string | null) => {
+              if (!value) return "部署で絞り込み";
+              const dept = departments.find((d) => d.id === value);
+              return dept?.name ?? value;
+            }}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {departments.map((dept) => (
