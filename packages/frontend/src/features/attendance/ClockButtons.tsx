@@ -4,6 +4,7 @@ import { LogIn, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatTime } from "./format";
+import { MemoDialog } from "./MemoDialog";
 import { useClockIn, useClockOut, useTodayStatus } from "./useAttendance";
 
 function CurrentTime() {
@@ -48,6 +49,7 @@ export function ClockButtons() {
   const { data: todayStatus, isLoading } = useTodayStatus();
   const clockInMutation = useClockIn();
   const clockOutMutation = useClockOut();
+  const [memoTarget, setMemoTarget] = useState<"clock-in" | "clock-out" | null>(null);
 
   if (isLoading) {
     return (
@@ -84,7 +86,7 @@ export function ClockButtons() {
         <button
           type="button"
           disabled={!canClockIn || isPending}
-          onClick={() => clockInMutation.mutate()}
+          onClick={() => setMemoTarget("clock-in")}
           className="flex flex-col items-center justify-center gap-2 rounded-xl bg-blue-500 py-8 text-white transition-colors hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400"
         >
           <LogIn className="h-8 w-8" />
@@ -93,13 +95,25 @@ export function ClockButtons() {
         <button
           type="button"
           disabled={!canClockOut || isPending}
-          onClick={() => clockOutMutation.mutate()}
+          onClick={() => setMemoTarget("clock-out")}
           className="flex flex-col items-center justify-center gap-2 rounded-xl bg-orange-500 py-8 text-white transition-colors hover:bg-orange-600 active:bg-orange-700 disabled:bg-gray-200 disabled:text-gray-400"
         >
           <LogOut className="h-8 w-8" />
           <span className="text-lg font-bold">退勤</span>
         </button>
       </div>
+      <MemoDialog
+        open={memoTarget !== null}
+        onConfirm={(memo) => {
+          if (memoTarget === "clock-in") {
+            clockInMutation.mutate(memo);
+          } else {
+            clockOutMutation.mutate(memo);
+          }
+          setMemoTarget(null);
+        }}
+        onCancel={() => setMemoTarget(null)}
+      />
     </div>
   );
 }

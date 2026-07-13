@@ -50,7 +50,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public AttendanceRecordResponse clockIn(UUID employeeId) {
+    public AttendanceRecordResponse clockIn(UUID employeeId, String memo) {
         var employee = findEmployeeOrThrow(employeeId);
         var today = LocalDate.now(clock);
 
@@ -65,6 +65,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .employee(employee)
                 .workDate(today)
                 .clockIn(now)
+                .memo(sanitizeMemo(memo))
                 .corrected(false)
                 .build();
 
@@ -75,15 +76,33 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public AttendanceRecordResponse clockOut(UUID employeeId) {
+    public AttendanceRecordResponse clockOut(UUID employeeId, String memo) {
         var today = LocalDate.now(clock);
         var record = attendanceRepository.findByEmployeeIdAndWorkDateAndClockOutIsNull(employeeId, today)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "No active clock-in found"));
 
         record.setClockOut(Instant.now(clock));
+        var sanitizedMemo = sanitizeMemo(memo);
+        if (sanitizedMemo != null) {
+            record.setMemo(sanitizedMemo);
+        }
         var saved = attendanceRepository.save(record);
         log.info("Clock-out recorded for employee={} at={}", employeeId, saved.getClockOut());
         return AttendanceRecordResponse.from(saved);
+    }
+
+    private String sanitizeMemo(String memo) {
+        if (memo == null) {
+            return null;
+        }
+        var trimmed = memo.strip();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        var sanitized = trimmed.replaceAll("(?i)<script[^>]*>.*?</script>", "");
+        sanitized = sanitized.replaceAll("<[^>]*>", "");
+        sanitized = sanitized.strip();
+        return sanitized.isEmpty() ? null : sanitized;
     }
 
     @Override

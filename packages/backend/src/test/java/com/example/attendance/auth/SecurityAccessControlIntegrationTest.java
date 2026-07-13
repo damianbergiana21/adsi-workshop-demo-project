@@ -117,8 +117,9 @@ class SecurityAccessControlIntegrationTest {
         @DisplayName("POST /api/attendance/clock-in")
         void clockIn() throws Exception {
             mockMvc.perform(post("/api/attendance/clock-in")
+                    .contentType("application/json")
                     .with(csrf())
-                    .param("employeeId", employeeId.toString()))
+                    .content("{\"employeeId\": \"" + employeeId + "\"}"))
                 .andExpect(status().isUnauthorized());
         }
 
@@ -245,9 +246,10 @@ class SecurityAccessControlIntegrationTest {
         @DisplayName("POST /api/attendance/clock-in → 201")
         void clockIn() throws Exception {
             mockMvc.perform(post("/api/attendance/clock-in")
+                    .contentType("application/json")
                     .session(employeeSession)
                     .with(csrf())
-                    .param("employeeId", employeeId.toString()))
+                    .content("{\"employeeId\": \"" + employeeId + "\"}"))
                 .andExpect(status().isCreated());
         }
 

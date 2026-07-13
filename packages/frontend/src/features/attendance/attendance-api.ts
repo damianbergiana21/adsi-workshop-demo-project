@@ -5,6 +5,7 @@ export interface AttendanceRecordResponse {
   workDate: string;
   clockIn: string;
   clockOut: string | null;
+  memo: string | null;
   corrected: boolean;
 }
 
@@ -44,16 +45,18 @@ export interface TeamMemberSummaryResponse {
   absentDays: number;
 }
 
-export function clockIn(employeeId: string): Promise<AttendanceRecordResponse> {
-  return apiClient.post<AttendanceRecordResponse>(
-    `/api/attendance/clock-in?employeeId=${employeeId}`,
-  );
+export function clockIn(employeeId: string, memo?: string): Promise<AttendanceRecordResponse> {
+  return apiClient.post<AttendanceRecordResponse>("/api/attendance/clock-in", {
+    employeeId,
+    memo: memo || undefined,
+  });
 }
 
-export function clockOut(employeeId: string): Promise<AttendanceRecordResponse> {
-  return apiClient.post<AttendanceRecordResponse>(
-    `/api/attendance/clock-out?employeeId=${employeeId}`,
-  );
+export function clockOut(employeeId: string, memo?: string): Promise<AttendanceRecordResponse> {
+  return apiClient.post<AttendanceRecordResponse>("/api/attendance/clock-out", {
+    employeeId,
+    memo: memo || undefined,
+  });
 }
 
 export function fetchTodayStatus(employeeId: string): Promise<TodayStatusResponse> {

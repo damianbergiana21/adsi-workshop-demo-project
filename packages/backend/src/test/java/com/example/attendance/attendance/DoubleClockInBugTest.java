@@ -26,12 +26,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Bug #1: 出勤ボタン連続押下で退勤不能になる問題の再現テスト。
- *
- * 期待: 2回目の clock-in は 409 Conflict で拒否されるべき。
- * 現状: 2回目も 201 で受理され、その後 clock-out が 500 になる。
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -81,22 +75,20 @@ class DoubleClockInBugTest {
     class PreventDoubleClockIn {
 
         @Test
-        @DisplayName("出勤済みの状態で再度出勤すると409 Conflictが返される（現在は201で受理されてしまう）")
+        @DisplayName("出勤済みの状態で再度出勤すると409 Conflictが返される")
         void clockIn_alreadyClockedIn_shouldReturn409() throws Exception {
-            // Arrange: 1回目の出勤（正常）
             mockMvc.perform(post("/api/attendance/clock-in")
+                    .contentType(APPLICATION_JSON)
                     .session(session)
                     .with(csrf())
-                    .param("employeeId", employeeId.toString()))
+                    .content("{\"employeeId\": \"" + employeeId + "\"}"))
                 .andExpect(status().isCreated());
 
-            // Act: 2回目の出勤（出勤済み状態）
-            // Assert: 409 Conflict が返されるべき
-            // BUG: 現状は 201 Created が返される（テスト失敗 = Red）
             mockMvc.perform(post("/api/attendance/clock-in")
+                    .contentType(APPLICATION_JSON)
                     .session(session)
                     .with(csrf())
-                    .param("employeeId", employeeId.toString()))
+                    .content("{\"employeeId\": \"" + employeeId + "\"}"))
                 .andExpect(status().isConflict());
         }
     }
@@ -108,25 +100,25 @@ class DoubleClockInBugTest {
         @Test
         @DisplayName("二重出勤が409で拒否された後も正常に退勤できる")
         void clockOut_afterRejectedDoubleClockIn_succeeds() throws Exception {
-            // Arrange: 1回目の出勤（正常）
             mockMvc.perform(post("/api/attendance/clock-in")
+                    .contentType(APPLICATION_JSON)
                     .session(session)
                     .with(csrf())
-                    .param("employeeId", employeeId.toString()))
+                    .content("{\"employeeId\": \"" + employeeId + "\"}"))
                 .andExpect(status().isCreated());
 
-            // Arrange: 2回目の出勤（409で拒否される）
             mockMvc.perform(post("/api/attendance/clock-in")
+                    .contentType(APPLICATION_JSON)
                     .session(session)
                     .with(csrf())
-                    .param("employeeId", employeeId.toString()))
+                    .content("{\"employeeId\": \"" + employeeId + "\"}"))
                 .andExpect(status().isConflict());
 
-            // Act & Assert: 退勤は正常に動作する（レコードは1件のみ）
             mockMvc.perform(post("/api/attendance/clock-out")
+                    .contentType(APPLICATION_JSON)
                     .session(session)
                     .with(csrf())
-                    .param("employeeId", employeeId.toString()))
+                    .content("{\"employeeId\": \"" + employeeId + "\"}"))
                 .andExpect(status().isOk());
         }
     }
